@@ -1,0 +1,13 @@
+name: customer-segmentation
+channels:
+  - defaults
+dependencies:
+  - python=3.12
+  - numpy
+  - jupyterlab
+  - scipy
+  - pandas
+  - ipykernel
+  - matplotlib
+  - scikit-learn
+prefix: C:\Users\gba74\.conda\envs\customer-segmentation
