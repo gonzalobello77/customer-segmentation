@@ -10,4 +10,5 @@ dependencies:
   - ipykernel
   - matplotlib
   - scikit-learn
+  - seaborn
 prefix: C:\Users\gba74\.conda\envs\customer-segmentation
