@@ -84,33 +84,98 @@ el clustering.
 
 ### Calidad de los datos
 
-Se revisaron valores faltantes y registros duplicados antes del modelado.
+Se revisaron valores faltantes y registros duplicados.
 
-Los valores faltantes se concentran en `CREDIT_LIMIT` y
-`MINIMUM_PAYMENTS`. Debido al reducido número de faltantes en
-`CREDIT_LIMIT` y a la marcada asimetría presente en variables monetarias, los
-valores faltantes se trataron mediante imputación con la mediana.
+Se detectó que dos variables tienen valores nulos:
 
-`CUST_ID` se eliminó antes del modelado, ya que representa únicamente un
-identificador y su inclusión introduciría distancias sin significado entre
-clientes.
+| Variable | Valores nulos | Porcentaje |
+|---|---:|---:|
+| `CREDIT_LIMIT` | 1 | 0.01% |
+| `MINIMUM_PAYMENTS` | 313 | 3.50% |
 
-La base procesada conserva finalmente **8.950 observaciones y 17 variables
-de comportamiento**.
+`CREDIT_LIMIT` representa el límite de crédito asignado al cliente, mientras que
+`MINIMUM_PAYMENTS` corresponde al monto asociado a pagos mínimos.
+
+Dado el contexto se planea imputar, y antes de hacerlo se compara la media y la mediana de
+ambas variables:
+
+| Variable | Media | Mediana |
+|---|---:|---:|
+| `CREDIT_LIMIT` | 4494.45 | 3000.00 |
+| `MINIMUM_PAYMENTS` | 864.21 | 312.34 |
+
+En ambos casos la media supera la mediana lo que sugiere que las
+distribuciones pueden estar influenciadas por valores elevados, por ello se imputa con la **mediana** ya que resulta menos sensible a valores extremos que la media.
+
+`CUST_ID` se eliminó antes del modelado porque funciona únicamente como
+identificador del cliente.
+
+Después de estas decisiones, la base procesada conserva **8.950 clientes y
+17 variables de comportamiento**.
 
 ### Distribución de las variables
+
+|                                  |   count |    mean |     std |   min |     25% |     50% |     75% |     max |
+|:---------------------------------|--------:|--------:|--------:|------:|--------:|--------:|--------:|--------:|
+| BALANCE                          |    8950 | 1564.47 | 2081.53 |  0    |  128.28 |  873.39 | 2054.14 | 19043.1 |
+| BALANCE_FREQUENCY                |    8950 |    0.88 |    0.24 |  0    |    0.89 |    1    |    1    |     1   |
+| PURCHASES                        |    8950 | 1003.2  | 2136.63 |  0    |   39.64 |  361.28 | 1110.13 | 49039.6 |
+| ONEOFF_PURCHASES                 |    8950 |  592.44 | 1659.89 |  0    |    0    |   38    |  577.4  | 40761.2 |
+| INSTALLMENTS_PURCHASES           |    8950 |  411.07 |  904.34 |  0    |    0    |   89    |  468.64 | 22500   |
+| CASH_ADVANCE                     |    8950 |  978.87 | 2097.16 |  0    |    0    |    0    | 1113.82 | 47137.2 |
+| PURCHASES_FREQUENCY              |    8950 |    0.49 |    0.4  |  0    |    0.08 |    0.5  |    0.92 |     1   |
+| ONEOFF_PURCHASES_FREQUENCY       |    8950 |    0.2  |    0.3  |  0    |    0    |    0.08 |    0.3  |     1   |
+| PURCHASES_INSTALLMENTS_FREQUENCY |    8950 |    0.36 |    0.4  |  0    |    0    |    0.17 |    0.75 |     1   |
+| CASH_ADVANCE_FREQUENCY           |    8950 |    0.14 |    0.2  |  0    |    0    |    0    |    0.22 |     1.5 |
+| CASH_ADVANCE_TRX                 |    8950 |    3.25 |    6.82 |  0    |    0    |    0    |    4    |   123   |
+| PURCHASES_TRX                    |    8950 |   14.71 |   24.86 |  0    |    1    |    7    |   17    |   358   |
+| CREDIT_LIMIT                     |    8950 | 4494.28 | 3638.65 | 50    | 1600    | 3000    | 6500    | 30000   |
+| PAYMENTS                         |    8950 | 1733.14 | 2895.06 |  0    |  383.28 |  856.9  | 1901.13 | 50721.5 |
+| MINIMUM_PAYMENTS                 |    8950 |  844.91 | 2332.79 |  0.02 |  170.86 |  312.34 |  788.71 | 76406.2 |
+| PRC_FULL_PAYMENT                 |    8950 |    0.15 |    0.29 |  0    |    0    |    0    |    0.14 |     1   |
+| TENURE                           |    8950 |   11.52 |    1.34 |  6    |   12    |   12    |   12    |    12   |
 
 Las variables presentan comportamientos considerablemente diferentes según
 su naturaleza. Los montos y conteos muestran, en varios casos, una fuerte
 concentración en valores bajos junto con colas derechas pronunciadas,
 especialmente en compras, adelantos de efectivo y pagos.
 
-En cambio, las variables de frecuencia y proporción se encuentran
-naturalmente acotadas, principalmente entre 0 y 1. Por ello, una distribución
-asimétrica no implica automáticamente que todas las variables deban recibir
-la misma transformación.
-
 ![Distribución de las variables](figures/feature_distributions.png)
+
+
+### Análisis de asimetría
+
+El coeficiente de asimetría confirma lo observado previamente en las
+distribuciones: varias variables presentan colas pronunciadas,
+especialmente aquellas asociadas a montos y actividad transaccional.
+
+|                                  |       |
+|:---------------------------------|------:|
+| MINIMUM_PAYMENTS                 | 13.85 |
+| ONEOFF_PURCHASES                 | 10.05 |
+| PURCHASES                        |  8.14 |
+| INSTALLMENTS_PURCHASES           |  7.3  |
+| PAYMENTS                         |  5.91 |
+| CASH_ADVANCE_TRX                 |  5.72 |
+| CASH_ADVANCE                     |  5.17 |
+| PURCHASES_TRX                    |  4.63 |
+| BALANCE                          |  2.39 |
+| PRC_FULL_PAYMENT                 |  1.94 |
+| CASH_ADVANCE_FREQUENCY           |  1.83 |
+| ONEOFF_PURCHASES_FREQUENCY       |  1.54 |
+| CREDIT_LIMIT                     |  1.52 |
+| PURCHASES_INSTALLMENTS_FREQUENCY |  0.51 |
+| PURCHASES_FREQUENCY              |  0.06 |
+| BALANCE_FREQUENCY                | -2.02 |
+| TENURE                           | -2.94 |
+
+Dado que el modelado posterior utiliza **K-Means**, un método basado en
+distancias, estas distribuciones pueden influir de forma desproporcionada en la
+formación de los grupos.
+
+Por ello, en la etapa de modelado se evaluarán transformaciones para reducir la
+asimetría de las variables pertinentes y posteriormente se aplicará
+estandarización para homogeneizar sus escalas.
 
 
 ### Boxplot de variables
