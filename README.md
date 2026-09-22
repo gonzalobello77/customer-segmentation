@@ -262,7 +262,7 @@ complementarios:
 - **Davies-Bouldin:** evalúa la similitud entre clusters; valores menores indican
   grupos más compactos y diferenciados.
 
-![Criterios para seleccionar el número de clusters](figures/03_cluster_selection_metrics.png)
+![Criterios para seleccionar el número de clusters](figures/cluster_selection_metrics.png)
 
 Los criterios no identifican una única solución dominante. `k = 2` presenta el
 mayor Silhouette Score y el mayor índice Calinski-Harabasz, mientras que
